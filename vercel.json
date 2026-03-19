@@ -1,8 +1,8 @@
 {
-  "buildCommand": "Build de carrera de NPM",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
   "env": {
-    "NODE_ENV": "Producción"
+    "NODE_ENV": "production"
   }
 }
