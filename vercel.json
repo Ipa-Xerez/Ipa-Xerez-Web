@@ -4,10 +4,5 @@
   "devCommand": "npm run dev",
   "env": {
     "NODE_ENV": "Producción"
-  },
-  "funciones": {
-    "servidor/**/*.ts": {
-      "duración": "nodejs18.x"
-    }
   }
 }
