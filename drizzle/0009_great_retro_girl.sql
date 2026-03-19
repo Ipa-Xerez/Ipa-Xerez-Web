@@ -1,1 +1,0 @@
-ALTER TABLE `administrators` MODIFY COLUMN `user_id` int;
