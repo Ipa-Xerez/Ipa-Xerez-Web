@@ -66,10 +66,10 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <PWAOfflineIndicator />
-          <PWAUpdateNotification />
-          <PWAAndroidInstall />
-          <PWAInstallPrompt />
+          {/* <PWAOfflineIndicator /> */}
+{/* <PWAUpdateNotification /> */}
+{/* <PWAAndroidInstall /> */}
+{/* <PWAInstallPrompt /> */}
           <Router />
         </TooltipProvider>
       </ThemeProvider>
