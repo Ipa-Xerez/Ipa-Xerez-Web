@@ -70,7 +70,7 @@ function App() {
 {/* <PWAUpdateNotification /> */}
 {/* <PWAAndroidInstall /> */}
 {/* <PWAInstallPrompt /> */}
-          <Router />
+          <div>TEST OK</div>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
