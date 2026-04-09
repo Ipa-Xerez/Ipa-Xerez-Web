@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Send, Calendar, Timer, Users, Globe, Heart, Award, Zap, ChevronDown, ArrowRight, Menu, X, LogIn } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Calendar, Timer, Users, Globe, Heart, Award, Zap, ChevronDown, ArrowRight, Menu, X, LogIn, Newspaper, Clock } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 
@@ -19,6 +19,158 @@ const SERVICE3 = "https://files.manuscdn.com/user_upload_by_module/session_file/
 const SERVICE4 = "https://files.manuscdn.com/user_upload_by_module/session_file/310419663030391939/XQLbepsewhNLSlYB.png";
 const POLICE_WEEK_POSTER = "/poster-washington.jpg";
 const INSCRIPTION_FORM = "/INSCRIPCION.pdf";
+
+// ===== Componente de Actualidad para la Home =====
+function ActualidadSection() {
+  const [, navigate] = useLocation();
+  const featuredQuery = trpc.blog.featured.useQuery();
+
+  const posts = featuredQuery.data || [];
+  const mainPost = posts[0];
+  const secondaryPosts = posts.slice(1, 4);
+
+  if (featuredQuery.isLoading) {
+    return (
+      <section className="py-16 md:py-20 bg-gradient-to-b from-white to-[#F5F5F5]">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#003366]/10 rounded-full px-5 py-2 mb-4">
+              <Newspaper className="w-4 h-4 text-[#003366]" />
+              <span className="text-sm font-semibold text-[#003366]">Noticias</span>
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl text-[#003366] font-bold">ACTUALIDAD IPA XEREZ</h2>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className="bg-gray-200 animate-pulse rounded-xl h-96"></div>
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-gray-200 animate-pulse rounded-xl h-28"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!mainPost) return null;
+
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  return (
+    <section className="py-16 md:py-20 bg-gradient-to-b from-white to-[#F5F5F5]">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-[#003366]/10 rounded-full px-5 py-2 mb-4">
+            <Newspaper className="w-4 h-4 text-[#003366]" />
+            <span className="text-sm font-semibold text-[#003366]">Noticias</span>
+          </div>
+          <h2 className="font-display text-3xl md:text-4xl text-[#003366] font-bold">ACTUALIDAD IPA XEREZ</h2>
+          <p className="text-gray-600 mt-3 text-lg max-w-2xl mx-auto">Las últimas novedades de nuestra agrupación</p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Noticia Principal */}
+          <div
+            className="group cursor-pointer bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            onClick={() => navigate(`/blog/${mainPost.id}`)}
+          >
+            <div className="relative overflow-hidden aspect-[16/10]">
+              {mainPost.image ? (
+                <img
+                  src={mainPost.image}
+                  alt={mainPost.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-[#003366] to-[#004d99] flex items-center justify-center">
+                  <Newspaper className="w-16 h-16 text-white/30" />
+                </div>
+              )}
+              <div className="absolute top-4 left-4">
+                <span className="bg-[#D4AF37] text-[#003366] text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+                  Destacado
+                </span>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                <Clock className="w-4 h-4" />
+                <time>{mainPost.publishedAt ? formatDate(mainPost.publishedAt) : ''}</time>
+                {mainPost.category && (
+                  <>
+                    <span className="text-gray-300">|</span>
+                    <span className="text-[#003366] font-medium">{mainPost.category}</span>
+                  </>
+                )}
+              </div>
+              <h3 className="font-heading text-xl md:text-2xl text-[#003366] font-bold mb-3 group-hover:text-[#D4AF37] transition-colors line-clamp-2">
+                {mainPost.title}
+              </h3>
+              <p className="text-gray-600 line-clamp-3 mb-4">{mainPost.excerpt}</p>
+              <span className="inline-flex items-center gap-2 text-[#003366] font-semibold group-hover:text-[#D4AF37] transition-colors">
+                Leer más <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </div>
+          </div>
+
+          {/* Noticias Secundarias */}
+          <div className="flex flex-col gap-4">
+            {secondaryPosts.map((post: any) => (
+              <div
+                key={post.id}
+                className="group cursor-pointer bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex"
+                onClick={() => navigate(`/blog/${post.id}`)}
+              >
+                <div className="relative w-32 md:w-40 flex-shrink-0 overflow-hidden">
+                  {post.image ? (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#003366] to-[#004d99] flex items-center justify-center">
+                      <Newspaper className="w-8 h-8 text-white/30" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 flex flex-col justify-center flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                    <Clock className="w-3 h-3" />
+                    <time>{post.publishedAt ? formatDate(post.publishedAt) : ''}</time>
+                  </div>
+                  <h4 className="font-heading text-sm md:text-base text-[#003366] font-bold group-hover:text-[#D4AF37] transition-colors line-clamp-2 mb-1">
+                    {post.title}
+                  </h4>
+                  <p className="text-gray-600 text-xs md:text-sm line-clamp-2">{post.excerpt}</p>
+                </div>
+              </div>
+            ))}
+
+            {/* Botón Ver Todas */}
+            <button
+              onClick={() => navigate('/blog')}
+              className="mt-2 w-full bg-[#003366] text-white py-4 rounded-xl font-bold text-base hover:bg-[#002244] transition-colors flex items-center justify-center gap-2 group"
+            >
+              Ver todas las noticias
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -44,7 +196,7 @@ export default function Home() {
   const faqs = [
     { q: "¿Cómo me uno a IPA Xerez?", a: "Puedes unirte completando el formulario de contacto o enviándonos un mensaje por WhatsApp. Te guiaremos en todo el proceso de membresía." },
     { q: "¿Cuál es el costo de la membresía?", a: "Los costos de membresía varían según el tipo. Contáctanos para recibir información detallada sobre las opciones disponibles." },
-    { q: "¿Cuáles son los beneficios de ser miembro?", a: "Acceso a descuentos exclusivos, red global de 140+ países, eventos internacionales, formación continua y mucha más camaradería." },
+    { q: "¿Cuáles son los beneficios de ser miembro?", a: "Acceso a descuentos exclusivos, red global en 68 países, eventos internacionales, formación continua y mucha más camaradería." },
     { q: "¿Puedo participar en los intercambios internacionales?", a: "Sí, todos nuestros miembros, socios y familiares pueden participar en cualquier evento de IPA. Organizamos intercambios y viajes internacionales en diferentes países." },
     { q: "¿Hay eventos locales en Jerez?", a: "Sí, organizamos eventos culturales como las Zambombas, visitas a la Yeguada y reuniones mensuales de camaradería." },
     { q: "¿Necesito ser policía en activo?", a: "No, también aceptamos policías jubilados y personal de seguridad. IPA es para todos los que compartan nuestros valores." }
@@ -186,13 +338,13 @@ export default function Home() {
           <div className="max-w-4xl mx-auto px-4">
             <div className="mb-6 inline-block">
               <div className="bg-[#D4AF37]/20 border border-[#D4AF37] rounded-full px-6 py-2 text-[#D4AF37] text-xs md:text-sm font-semibold backdrop-blur-sm">
-                ✨ 370.000+ Miembros | Más de 60 Países | Servo per Amikeco
+                ✨ 380.000+ Miembros | 68 Países | Servo per Amikeco
               </div>
             </div>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-2 leading-tight font-bold drop-shadow-lg">ASOCIACIÓN INTERNACIONAL</h1>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight font-bold drop-shadow-lg">DE POLICÍAS</h1>
             <p className="text-2xl md:text-3xl mb-6 text-[#D4AF37] drop-shadow-md font-semibold">AGRUPACIÓN XEREZ</p>
-            <p className="text-lg md:text-2xl mb-10 text-gray-100 drop-shadow-md max-w-2xl mx-auto">Únete a IPA Xerez: la mayor asociación policial del mundo con 370.000+ miembros. Amistad, profesionalidad y hermandad internacional en más de 60 países</p>
+            <p className="text-lg md:text-2xl mb-10 text-gray-100 drop-shadow-md max-w-2xl mx-auto">Únete a IPA Xerez: la mayor asociación policial del mundo con 380.000+ miembros. Amistad, profesionalidad y hermandad internacional en 68 países</p>
             <div className="flex gap-4 justify-center flex-wrap pointer-events-auto">
               <Button className="bg-[#D4AF37] text-[#003366] hover:bg-[#FFD700] text-base md:text-lg px-8 md:px-10 py-6 md:py-7 font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2" onClick={() => setShowInscriptionModal(true)}>
                 Hazte Socio Ahora <ArrowRight className="w-5 h-5" />
@@ -251,13 +403,16 @@ export default function Home() {
       {/* Espaciador para que el contenido no se superponga con el widget fijo */}
       <div className="h-16 hidden sm:block"></div>
 
+      {/* ===== ACTUALIDAD IPA XEREZ ===== */}
+      <ActualidadSection />
+
       {/* Sección Descripción SEO */}
       <section className="py-12 md:py-16 bg-white border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display text-2xl md:text-3xl text-[#003366] mb-4 font-bold">Sobre IPA Xerez</h2>
             <p className="text-gray-700 text-lg leading-relaxed mb-4">
-              <strong>IPA Xerez es la agrupación local de la International Police Association en Jerez de la Frontera</strong>, dedicada a promover la amistad entre policías, la formación profesional continua y las actividades culturales y profesionales. Como parte de una red global de más de 370.000 miembros en 140+ países, IPA Xerez representa los valores de hermandad, solidaridad y cooperación internacional sin fronteras.
+              <strong>IPA Xerez es la agrupación local de la International Police Association en Jerez de la Frontera</strong>, dedicada a promover la amistad entre policías, la formación profesional continua y las actividades culturales y profesionales. Como parte de una red global de más de 380.000 miembros en 68 países, IPA Xerez representa los valores de hermandad, solidaridad y cooperación internacional sin fronteras.
             </p>
             <p className="text-gray-700 text-lg leading-relaxed">
               Nuestra misión es fortalecer los lazos de camaradería entre profesionales de la seguridad, facilitar intercambios internacionales, ofrecer formación especializada y crear oportunidades de desarrollo profesional. Bajo el lema "Servo per Amikeco" (Servir por la Amistad), trabajamos para construir una comunidad policial global basada en valores compartidos de profesionalidad, integridad y hermandad.
@@ -273,13 +428,13 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             <Card className="border-0 shadow-lg text-center p-8 bg-white hover:shadow-xl transition-shadow">
               <Users className="w-12 h-12 text-[#D4AF37] mx-auto mb-4" />
-              <p className="text-4xl font-bold text-[#003366] mb-2">140+</p>
+              <p className="text-4xl font-bold text-[#003366] mb-2">68</p>
               <p className="text-gray-600 font-semibold">Países Miembros</p>
               <p className="text-sm text-gray-500 mt-2">Red global de IPA</p>
             </Card>
             <Card className="border-0 shadow-lg text-center p-8 bg-white hover:shadow-xl transition-shadow">
               <Globe className="w-12 h-12 text-[#D4AF37] mx-auto mb-4" />
-              <p className="text-4xl font-bold text-[#003366] mb-2">370K+</p>
+              <p className="text-4xl font-bold text-[#003366] mb-2">380K+</p>
               <p className="text-gray-600 font-semibold">Miembros Activos</p>
               <p className="text-sm text-gray-500 mt-2">En todo el mundo</p>
             </Card>
@@ -347,7 +502,7 @@ export default function Home() {
             <div className="text-center p-6 bg-white/10 rounded-lg backdrop-blur-sm">
               <Globe className="w-12 h-12 mx-auto mb-4 text-[#D4AF37]" />
               <h3 className="font-heading text-xl mb-2 font-bold">Red Global de Policías</h3>
-              <p className="text-gray-100 text-sm">Conecta con policías internacionales en 140+ países. Hermandad policial sin fronteras</p>
+              <p className="text-gray-100 text-sm">Conecta con policías internacionales en 68 países. Hermandad policial sin fronteras</p>
             </div>
             <div className="text-center p-6 bg-white/10 rounded-lg backdrop-blur-sm">
               <Heart className="w-12 h-12 mx-auto mb-4 text-[#D4AF37]" />
@@ -383,7 +538,7 @@ export default function Home() {
               
               <div className="bg-gradient-to-br from-[#D4AF37]/5 to-[#003366]/5 p-6 rounded-lg border-l-4 border-[#003366]">
                 <h3 className="font-heading text-xl text-[#003366] mb-4 font-bold">IPA Hoy</h3>
-                <p className="text-gray-700 leading-relaxed mb-3">Hoy, la International Police Association es la mayor asociación policial del mundo con más de 370.000 miembros en más de 60 países. En IPA Xerez, continuamos con la misión original: fomentar la amistad, la cooperación internacional y el desarrollo profesional.</p>
+                <p className="text-gray-700 leading-relaxed mb-3">Hoy, la International Police Association es la mayor asociación policial del mundo con más de 380.000 miembros en 68 países. En IPA Xerez, continuamos con la misión original: fomentar la amistad, la cooperación internacional y el desarrollo profesional.</p>
                 <p className="text-gray-700 leading-relaxed">Nuestro lema "Servo per Amikeco" (Servir por la Amistad) refleja los valores fundamentales de hermandad, solidaridad y profesionalismo que nos unen.</p>
               </div>
             </div>
@@ -525,7 +680,7 @@ export default function Home() {
                   <p className="text-sm text-gray-500">Policía Nacional, Xerez</p>
                 </div>
               </div>
-              <p className="text-gray-700 italic mb-4">"La camaradería en IPA es increíble. Cuando tuve un problema familiar, policías de otros países me apoyaron. Es como tener una familia extendida en 140 países."</p>
+              <p className="text-gray-700 italic mb-4">"La camaradería en IPA es increíble. Cuando tuve un problema familiar, policías de otros países me apoyaron. Es como tener una familia extendida en 68 países."</p>
               <div className="flex gap-1 text-[#D4AF37]">★★★★★</div>
             </div>
             

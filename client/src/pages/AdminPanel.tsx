@@ -38,7 +38,7 @@ export default function AdminPanel() {
   const deleteDocument = trpc.documents.delete.useMutation();
 
   // Blog state
-  const [newBlogArticle, setNewBlogArticle] = useState({ title: "", excerpt: "", content: "", author: "", image: "" });
+  const [newBlogArticle, setNewBlogArticle] = useState({ title: "", excerpt: "", content: "", author: "", image: "", featured: 0, featuredOrder: 0 });
   const [blogImageFile, setBlogImageFile] = useState<File | null>(null);
   const [blogImagePreview, setBlogImagePreview] = useState<string>("");
   const [editingBlogId, setEditingBlogId] = useState<number | null>(null);
@@ -147,9 +147,11 @@ export default function AdminPanel() {
         content: cleanText(newBlogArticle.content),
         author: cleanText(newBlogArticle.author),
         image: imageUrl || "",
+        featured: newBlogArticle.featured,
+        featuredOrder: newBlogArticle.featuredOrder,
         // slug is auto-generated from title on backend
       });
-      setNewBlogArticle({ title: "", excerpt: "", content: "", author: "", image: "" });
+      setNewBlogArticle({ title: "", excerpt: "", content: "", author: "", image: "", featured: 0, featuredOrder: 0 });
       setBlogImageFile(null);
       setBlogImagePreview("");
       blogList.refetch();
@@ -181,7 +183,8 @@ export default function AdminPanel() {
       content: blog.content,
       author: blog.author || "",
       image: blog.image || "",
-
+      featured: blog.featured || 0,
+      featuredOrder: blog.featuredOrder || 0,
     });
     setBlogImagePreview(blog.image || "");
   };
@@ -200,9 +203,11 @@ export default function AdminPanel() {
         content: cleanText(newBlogArticle.content),
         author: cleanText(newBlogArticle.author),
         image: imageUrl || "",
+        featured: newBlogArticle.featured,
+        featuredOrder: newBlogArticle.featuredOrder,
       });
       setEditingBlogId(null);
-      setNewBlogArticle({ title: "", excerpt: "", content: "", author: "", image: "" });
+      setNewBlogArticle({ title: "", excerpt: "", content: "", author: "", image: "", featured: 0, featuredOrder: 0 });
       setBlogImageFile(null);
       setBlogImagePreview("");
       blogList.refetch();
@@ -214,7 +219,7 @@ export default function AdminPanel() {
 
   const handleCancelEditBlog = () => {
     setEditingBlogId(null);
-    setNewBlogArticle({ title: "", excerpt: "", content: "", author: "", image: "" });
+    setNewBlogArticle({ title: "", excerpt: "", content: "", author: "", image: "", featured: 0, featuredOrder: 0 });
     setBlogImageFile(null);
     setBlogImagePreview("");
   };
@@ -580,7 +585,32 @@ export default function AdminPanel() {
                     </div>
                     {blogImagePreview && (
                       <div style={{ marginTop: 10 }}>
-                        <img src={blogImagePreview} alt="Preview" style={{ maxWidth: 200, borderRadius: 4 }} />
+                        <img src={blogImagePreview} alt="Preview" style={{ maxWidth: 300, maxHeight: 200, borderRadius: 4, objectFit: "cover" }} />
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 20, alignItems: "center", padding: "12px 16px", background: "#f0f7ff", borderRadius: 8, border: "1px solid #cce0ff" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={newBlogArticle.featured === 1}
+                        onChange={(e) => setNewBlogArticle({ ...newBlogArticle, featured: e.target.checked ? 1 : 0 })}
+                        style={{ width: 18, height: 18, cursor: "pointer" }}
+                      />
+                      <span style={{ fontWeight: "bold", color: "#003366" }}>Mostrar en portada</span>
+                    </label>
+                    {newBlogArticle.featured === 1 && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <label style={{ fontWeight: "bold", color: "#003366", fontSize: 13 }}>Orden en portada:</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="99"
+                          value={newBlogArticle.featuredOrder}
+                          onChange={(e) => setNewBlogArticle({ ...newBlogArticle, featuredOrder: parseInt(e.target.value) || 0 })}
+                          style={{ width: 70, padding: 6, border: "1px solid #ccc", borderRadius: 4, textAlign: "center" }}
+                        />
+                        <span style={{ fontSize: 12, color: "#666" }}>(menor = primero)</span>
                       </div>
                     )}
                   </div>
@@ -629,12 +659,23 @@ export default function AdminPanel() {
                 ) : blogList.data && blogList.data.length > 0 ? (
                   <div style={{ display: "grid", gap: 15 }}>
                     {blogList.data.map((blog: any) => (
-                      <div key={blog.id} style={{ background: "#f9f9f9", padding: 15, borderRadius: 8, borderLeft: "4px solid #0066cc" }}>
+                      <div key={blog.id} style={{ background: "#f9f9f9", padding: 15, borderRadius: 8, borderLeft: `4px solid ${blog.featured ? '#D4AF37' : '#0066cc'}` }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                          <div>
-                            <h4>{blog.title}</h4>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                              <h4 style={{ margin: 0 }}>{blog.title}</h4>
+                              {blog.featured === 1 && (
+                                <span style={{ background: "#D4AF37", color: "#003366", fontSize: 10, fontWeight: "bold", padding: "2px 8px", borderRadius: 12 }}>PORTADA</span>
+                              )}
+                            </div>
                             <p style={{ color: "#666", fontSize: 14 }}>{blog.excerpt}</p>
-                            {blog.author && <small style={{ color: "#999" }}>Por: {blog.author}</small>}
+                            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                              {blog.author && <small style={{ color: "#999" }}>Por: {blog.author}</small>}
+                              {blog.publishedAt && <small style={{ color: "#999" }}>{new Date(blog.publishedAt).toLocaleDateString('es-ES')}</small>}
+                            </div>
+                            {blog.image && (
+                              <img src={blog.image} alt={blog.title} style={{ maxWidth: 120, maxHeight: 80, borderRadius: 4, objectFit: "cover", marginTop: 8 }} />
+                            )}
                           </div>
                           <div style={{ display: "flex", gap: 10 }}>
                             <button
