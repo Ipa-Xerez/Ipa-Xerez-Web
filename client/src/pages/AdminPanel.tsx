@@ -848,21 +848,14 @@ export default function AdminPanel() {
                     onChange={(e) => setNewDocument({ ...newDocument, description: e.target.value })}
                     style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4, minHeight: 80 }}
                   />
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}>Sección del Documento:</label>
-                    <select
-                      value={newDocument.documentType}
-                      onChange={(e) => setNewDocument({ ...newDocument, documentType: e.target.value })}
-                      style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4, width: "100%", boxSizing: "border-box" }}
-                    >
-                      <option value="">-- Selecciona una sección --</option>
-                      <option value="estatutos">Estatutos</option>
-                      <option value="actas_reuniones">Actas de Reuniones</option>
-                      <option value="comunicados_internos">Comunicados Internos</option>
-                      <option value="guias_manuales">Guías y Manuales</option>
-                      <option value="otros_documentos">Otros Documentos</option>
-                    </select>
-                  </div>
+                  <select
+                    value={newDocument.documentType}
+                    onChange={(e) => setNewDocument({ ...newDocument, documentType: e.target.value })}
+                    style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                  >
+                    <option value="private">Privado</option>
+                    <option value="public">Público</option>
+                  </select>
                   <input
                     type="text"
                     placeholder="URL del documento"
